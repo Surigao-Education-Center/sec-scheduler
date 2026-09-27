@@ -6,6 +6,7 @@ use Modules\RoomScheduling\Http\Controllers\Admin\RoomAdminController;
 use Modules\RoomScheduling\Http\Controllers\Admin\ScheduleAdminController;
 use Modules\RoomScheduling\Http\Controllers\Admin\SectionAdminController;
 use Modules\RoomScheduling\Http\Controllers\Admin\SubjectAdminController;
+use Modules\RoomScheduling\Http\Controllers\ReportsController;
 use Modules\RoomScheduling\Http\Controllers\ScheduleGridController;
 
 /*
@@ -17,6 +18,10 @@ use Modules\RoomScheduling\Http\Controllers\ScheduleGridController;
 
 Route::get('/timetable', [ScheduleGridController::class, 'index'])->name('timetable');
 Route::patch('/timetable/schedules/{schedule}/position', [ScheduleGridController::class, 'updatePosition'])->name('timetable.position');
+
+Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+Route::get('/reports/export/csv', [ReportsController::class, 'exportCsv'])->name('reports.export.csv');
+Route::get('/reports/print', [ReportsController::class, 'print'])->name('reports.print');
 
 Route::resource('rooms', RoomAdminController::class)->except('show');
 Route::resource('instructors', InstructorAdminController::class)->except('show');

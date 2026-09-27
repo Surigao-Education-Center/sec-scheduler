@@ -1,62 +1,72 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4" style="max-width: 640px;">
-    <h3>{{ $section->exists ? 'Edit Section' : 'Add Section' }}</h3>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+<div class="page-wrap form-shell">
+    <div class="page-heading" style="margin-bottom: 18px;">
+        <div>
+            <div class="eyebrow">Section setup</div>
+            <h1>{{ $section->exists ? 'Edit Section' : 'Add Section' }}</h1>
+            <p>{{ $section->exists ? 'Update this section profile.' : 'Create a new section for an academic subject.' }}</p>
         </div>
-    @endif
+    </div>
 
-    <form method="POST" action="{{ $section->exists ? route('roomscheduling.sections.update', $section) : route('roomscheduling.sections.store') }}">
-        @csrf
-        @if ($section->exists) @method('PUT') @endif
-
-        <div class="mb-3">
-            <label class="form-label">Subject</label>
-            <select name="subject_id" class="form-select" required>
-                <option value="">— Select subject —</option>
-                @foreach ($subjects as $subject)
-                    <option value="{{ $subject->id }}" @selected(old('subject_id', $section->subject_id) == $subject->id)>
-                        {{ $subject->code }} - {{ $subject->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Section Code</label>
-            <input type="text" name="section_code" class="form-control" value="{{ old('section_code', $section->section_code) }}" placeholder="e.g. BSCS-1A" required>
-        </div>
-
-        <div class="row">
-            <div class="col mb-3">
-                <label class="form-label">School Year</label>
-                <input type="text" name="school_year" class="form-control" value="{{ old('school_year', $section->school_year) }}" placeholder="e.g. 2026-2027" required>
+    <div class="form-panel">
+        @if ($errors->any())
+            <div class="notice notice-error" style="border-color: #efc3b5; background: #fff5f1; color: #924c3b; margin-bottom: 20px;">
+                <ul class="mb-0" style="padding-left: 18px; margin: 0;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <div class="col mb-3">
-                <label class="form-label">Semester</label>
-                <select name="semester" class="form-select" required>
-                    @foreach (config('roomscheduling.semesters') as $semester)
-                        <option value="{{ $semester }}" @selected(old('semester', $section->semester) === $semester)>{{ $semester }}</option>
+        @endif
+
+        <form method="POST" action="{{ $section->exists ? route('roomscheduling.sections.update', $section) : route('roomscheduling.sections.store') }}" class="entity-form">
+            @csrf
+            @if ($section->exists) @method('PUT') @endif
+
+            <div class="field-group">
+                <label for="subject_id">Subject</label>
+                <select id="subject_id" name="subject_id" required>
+                    <option value="">— Select subject —</option>
+                    @foreach ($subjects as $subject)
+                        <option value="{{ $subject->id }}" @selected(old('subject_id', $section->subject_id) == $subject->id)>
+                            {{ $subject->code }} - {{ $subject->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label">Max Students</label>
-            <input type="number" name="max_students" class="form-control" value="{{ old('max_students', $section->max_students ?? 40) }}" min="1" required>
-        </div>
+            <div class="field-group">
+                <label for="section_code">Section code</label>
+                <input type="text" id="section_code" name="section_code" value="{{ old('section_code', $section->section_code) }}" placeholder="e.g. BSCS-1A" required>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Save Section</button>
-        <a href="{{ route('roomscheduling.sections.index') }}" class="btn btn-link">Cancel</a>
-    </form>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="school_year">School year</label>
+                    <input type="text" id="school_year" name="school_year" value="{{ old('school_year', $section->school_year) }}" placeholder="e.g. 2026-2027" required>
+                </div>
+                <div class="field-group">
+                    <label for="semester">Semester</label>
+                    <select id="semester" name="semester" required>
+                        @foreach (config('roomscheduling.semesters') as $semester)
+                            <option value="{{ $semester }}" @selected(old('semester', $section->semester) === $semester)>{{ $semester }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label for="max_students">Max students</label>
+                <input type="number" id="max_students" name="max_students" value="{{ old('max_students', $section->max_students ?? 40) }}" min="1" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button">Save section</button>
+                <a href="{{ route('roomscheduling.sections.index') }}" class="button button-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection

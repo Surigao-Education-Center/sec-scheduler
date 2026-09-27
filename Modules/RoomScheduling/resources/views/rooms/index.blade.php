@@ -1,52 +1,84 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Rooms</h3>
-        <a href="{{ route('roomscheduling.rooms.create') }}" class="btn btn-primary btn-sm">+ Add Room</a>
+<div class="page-wrap">
+    <div class="page-heading">
+        <div>
+            <div class="eyebrow">Room inventory</div>
+            <h1>Rooms</h1>
+            <p>Monitor room availability, capacities, and room types across the campus.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{{ route('roomscheduling.rooms.create') }}" class="button">+ Add room</a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="eyebrow">Total rooms</div>
+            <strong>{{ $rooms->total() }}</strong>
+            <span>Across all buildings</span>
+        </div>
+        <div class="stat-card">
+            <div class="eyebrow">Active</div>
+            <strong>{{ $rooms->where('is_active', true)->count() }}</strong>
+            <span>Ready for scheduling</span>
+        </div>
+        <div class="stat-card">
+            <div class="eyebrow">Capacity</div>
+            <strong>{{ $rooms->sum('capacity') }}</strong>
+            <span>Seats available</span>
+        </div>
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="notice notice-success" role="status">{{ session('success') }}</div>
     @endif
 
-    <table class="table table-bordered table-sm bg-white">
-        <thead class="table-light">
-            <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Building / Floor</th>
-                <th>Capacity</th>
-                <th>Type</th>
-                <th>Active</th>
-                <th style="width:140px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($rooms as $room)
-                <tr>
-                    <td>{{ $room->code }}</td>
-                    <td>{{ $room->name }}</td>
-                    <td>{{ $room->building }} {{ $room->floor ? '/ Fl. '.$room->floor : '' }}</td>
-                    <td>{{ $room->capacity }}</td>
-                    <td>{{ ucfirst($room->type) }}</td>
-                    <td>{{ $room->is_active ? 'Yes' : 'No' }}</td>
-                    <td>
-                        <a href="{{ route('roomscheduling.rooms.edit', $room) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form action="{{ route('roomscheduling.rooms.destroy', $room) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this room?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="7" class="text-center text-muted py-3">No rooms yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Building / Floor</th>
+                        <th>Capacity</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th class="actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($rooms as $room)
+                        <tr>
+                            <td><strong>{{ $room->code }}</strong></td>
+                            <td><span class="entity-name">{{ $room->name }}</span></td>
+                            <td>{{ $room->building }} {{ $room->floor ? '/ Fl. '.$room->floor : '—' }}</td>
+                            <td>{{ $room->capacity }}</td>
+                            <td><span class="meta-badge muted">{{ ucfirst($room->type) }}</span></td>
+                            <td>
+                                <span class="status-pill {{ $room->is_active ? 'active' : 'inactive' }}">
+                                    {{ $room->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="action-group">
+                                <a href="{{ route('roomscheduling.rooms.edit', $room) }}" class="button button-small button-secondary">Edit</a>
+                                <form action="{{ route('roomscheduling.rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="button button-small button-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="7" class="empty-state">No rooms yet. Add the first room to start planning the schedule.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    {{ $rooms->links() }}
+    <div class="pagination-wrap">{{ $rooms->links() }}</div>
 </div>
 @endsection

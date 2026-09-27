@@ -1,50 +1,85 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Subjects</h3>
-        <a href="{{ route('roomscheduling.subjects.create') }}" class="btn btn-primary btn-sm">+ Add Subject</a>
+<div class="page-wrap">
+    <div class="page-heading">
+        <div>
+            <div class="eyebrow">Curriculum</div>
+            <h1>Subjects</h1>
+            <p>Review the academic courses offered, workload values, and instructional mix.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{{ route('roomscheduling.subjects.create') }}" class="button">+ Add subject</a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="eyebrow">Total subjects</div>
+            <strong>{{ $subjects->total() }}</strong>
+            <span>Offerings in catalog</span>
+        </div>
+        <div class="stat-card">
+            <div class="eyebrow">Active</div>
+            <strong>{{ $subjects->where('is_active', true)->count() }}</strong>
+            <span>Available to schedule</span>
+        </div>
+        <div class="stat-card">
+            <div class="eyebrow">Unit load</div>
+            <strong>{{ $subjects->sum('units') }}</strong>
+            <span>Total credit units</span>
+        </div>
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="notice notice-success" role="status">{{ session('success') }}</div>
     @endif
 
-    <table class="table table-bordered table-sm bg-white">
-        <thead class="table-light">
-            <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Units</th>
-                <th>Lec / Lab hrs</th>
-                <th>Active</th>
-                <th style="width:140px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($subjects as $subject)
-                <tr>
-                    <td>{{ $subject->code }}</td>
-                    <td>{{ $subject->name }}</td>
-                    <td>{{ $subject->units }}</td>
-                    <td>{{ $subject->lecture_hours }} / {{ $subject->lab_hours }}</td>
-                    <td>{{ $subject->is_active ? 'Yes' : 'No' }}</td>
-                    <td>
-                        <a href="{{ route('roomscheduling.subjects.edit', $subject) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form action="{{ route('roomscheduling.subjects.destroy', $subject) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this subject?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="6" class="text-center text-muted py-3">No subjects yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Units</th>
+                        <th>Lec / Lab</th>
+                        <th>Status</th>
+                        <th class="actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($subjects as $subject)
+                        <tr>
+                            <td><strong>{{ $subject->code }}</strong></td>
+                            <td>
+                                <span class="entity-name">{{ $subject->name }}</span>
+                                <span class="table-subtext">{{ Str::limit($subject->description ?? 'No description', 60) }}</span>
+                            </td>
+                            <td>{{ $subject->units }}</td>
+                            <td>{{ $subject->lecture_hours }} / {{ $subject->lab_hours }}</td>
+                            <td>
+                                <span class="status-pill {{ $subject->is_active ? 'active' : 'inactive' }}">
+                                    {{ $subject->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="action-group">
+                                <a href="{{ route('roomscheduling.subjects.edit', $subject) }}" class="button button-small button-secondary">Edit</a>
+                                <form action="{{ route('roomscheduling.subjects.destroy', $subject) }}" method="POST" onsubmit="return confirm('Delete this subject?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="button button-small button-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="empty-state">No subjects yet. Add a course to build the curriculum list.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    {{ $subjects->links() }}
+    <div class="pagination-wrap">{{ $subjects->links() }}</div>
 </div>
 @endsection

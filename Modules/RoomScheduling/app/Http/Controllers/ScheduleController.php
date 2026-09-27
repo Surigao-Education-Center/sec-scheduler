@@ -89,9 +89,14 @@ class ScheduleController extends Controller
             'school_year' => ['required', 'string'],
             'semester' => ['required', 'string'],
             'ignore_id' => ['nullable', 'integer'],
+            'allow_non_block_sectioning' => ['nullable', 'boolean'],
         ]);
 
-        $conflicts = $this->conflicts->findConflicts($data, $data['ignore_id'] ?? null);
+        $conflicts = $this->conflicts->findConflicts(
+            $data,
+            $data['ignore_id'] ?? null,
+            (bool) ($data['allow_non_block_sectioning'] ?? false)
+        );
 
         return response()->json([
             'has_conflicts' => count($conflicts) > 0,

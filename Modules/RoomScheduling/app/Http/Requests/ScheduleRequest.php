@@ -24,6 +24,7 @@ class ScheduleRequest extends FormRequest
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'school_year' => ['required', 'string'],
             'semester' => ['required', 'string'],
+            'allow_non_block_sectioning' => ['nullable', 'boolean'],
         ];
     }
 
@@ -38,12 +39,15 @@ class ScheduleRequest extends FormRequest
                 return; // don't check conflicts against malformed input
             }
 
+            $allowNonBlockSectioning = (bool) ($this->boolean('allow_non_block_sectioning') ?? false);
+
             $conflicts = app(ScheduleConflictService::class)->findConflicts(
                 $this->only([
                     'room_id', 'instructor_id', 'section_id',
                     'day', 'start_time', 'end_time', 'school_year', 'semester',
                 ]),
-                $this->route('schedule') ? (int) $this->route('schedule') : null
+                $this->route('schedule') ? (int) $this->route('schedule') : null,
+                $allowNonBlockSectioning
             );
 
             foreach ($conflicts as $field => $message) {

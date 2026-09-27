@@ -15,6 +15,15 @@ Subject plotting and room/instructor scheduling for a Laravel enrollment system,
 
 ## Installation (merging into your enrollment system)
 
+From the scheduler repository, preview and then run the import against an existing Laravel project:
+
+```powershell
+.\scripts\Import-RoomScheduling.ps1 -TargetProjectPath 'C:\path\to\your-project' -WhatIf
+.\scripts\Import-RoomScheduling.ps1 -TargetProjectPath 'C:\path\to\your-project'
+```
+
+The script copies new module files, preserves differing files already in the target, merges the Composer PSR-4 mappings and module-enabled status, then runs `composer dump-autoload`. Use `-Overwrite` to replace differing module files; replaced files are backed up beside the originals. The script does not install dependencies or run migrations/seeders. Review the target app's schema and authorization before enabling the module in production.
+
 1. If not already installed, add the modules package to your Laravel app:
    ```bash
    composer require nwidart/laravel-modules

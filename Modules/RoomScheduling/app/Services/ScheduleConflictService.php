@@ -23,7 +23,7 @@ class ScheduleConflictService
      * @param  int|null  $ignoreScheduleId  Exclude this row (used when updating an existing schedule)
      * @return array<string, string>  Keyed by conflict type: room, instructor, section
      */
-    public function findConflicts(array $data, ?int $ignoreScheduleId = null): array
+    public function findConflicts(array $data, ?int $ignoreScheduleId = null, bool $allowNonBlockSectioning = false): array
     {
         $conflicts = [];
 
@@ -57,25 +57,27 @@ class ScheduleConflictService
             );
         }
 
-        $sectionConflict = $this->overlapping($data, $ignoreScheduleId)
-            ->where('section_id', $data['section_id'])
-            ->first();
+        if (! $allowNonBlockSectioning) {
+            $sectionConflict = $this->overlapping($data, $ignoreScheduleId)
+                ->where('section_id', $data['section_id'])
+                ->first();
 
-        if ($sectionConflict) {
-            $conflicts['section_id'] = sprintf(
-                'This section already has a class scheduled on %s %s-%s.',
-                $data['day'],
-                $sectionConflict->start_time,
-                $sectionConflict->end_time
-            );
+            if ($sectionConflict) {
+                $conflicts['section_id'] = sprintf(
+                    'This section already has a class scheduled on %s %s-%s.',
+                    $data['day'],
+                    $sectionConflict->start_time,
+                    $sectionConflict->end_time
+                );
+            }
         }
 
         return $conflicts;
     }
 
-    public function hasConflicts(array $data, ?int $ignoreScheduleId = null): bool
+    public function hasConflicts(array $data, ?int $ignoreScheduleId = null, bool $allowNonBlockSectioning = false): bool
     {
-        return count($this->findConflicts($data, $ignoreScheduleId)) > 0;
+        return count($this->findConflicts($data, $ignoreScheduleId, $allowNonBlockSectioning)) > 0;
     }
 
     protected function overlapping(array $data, ?int $ignoreScheduleId)
