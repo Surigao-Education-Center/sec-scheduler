@@ -1,0 +1,20 @@
+{
+    "name": "nwidart/roomscheduling",
+    "description": "Subject plotting and room scheduling module for enrollment systems",
+    "type": "library",
+    "license": "MIT",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\RoomScheduling\\Providers\\RoomSchedulingServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\RoomScheduling\\": "app/",
+            "Modules\\RoomScheduling\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "RoomScheduling",
+    "alias": "roomscheduling",
+    "description": "Subject plotting and room/instructor scheduling module with conflict validation, for use inside a Laravel enrollment system.",
+    "keywords": ["enrollment", "scheduling", "rooms", "subjects"],
+    "priority": 0,
+    "providers": [
+        "Modules\\RoomScheduling\\Providers\\RoomSchedulingServiceProvider"
+    ],
+    "files": []
+}
